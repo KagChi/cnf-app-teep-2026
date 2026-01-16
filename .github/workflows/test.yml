@@ -12,4 +12,4 @@ jobs:
   test:
     uses: kagchi/workflows/.github/workflows/lint-and-build-test.yaml@main
     with:
-      USE_BUN: "true"
+      USE_BUN: true
