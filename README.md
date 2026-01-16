@@ -1,48 +1,46 @@
 # Cloud-Native Network Function (CNF)
 
-This is a simple Bun TypeScript application that simulates a Cloud-Native Network Function (CNF) for the O-Cloud environment. It provides various endpoints to monitor and manage the simulated CNF.
+A simple Bun TypeScript application that simulates a Cloud-Native Network Function (CNF) for the O-Cloud environment.
 
 ## Features
-- Health check endpoint (`/health`)
-- Status information endpoint (`/status`)
-- Configuration information endpoint (`/config`)
+- Liveness probe endpoint (`/health/live`)
+- Readiness probe endpoint (`/health/ready`)
 - Service information endpoint (`/info`)
-- Environment variable monitoring
-- Kubernetes node identification
+- Graceful shutdown handling
+- Environment-aware configuration
+- Unique CNF instance identification
 
 ## Endpoints
-- `/health` - Returns health status of the CNF
-- `/status` - Provides detailed status information
-- `/config` - Shows environment configuration
-- `/info` - Displays service information
-- `/` - Root endpoint that returns status information
+- `/health/live` - Liveness probe; returns 503 during shutdown
+- `/health/ready` - Readiness probe; returns CNF instance details
+- `/info` - Service metadata and available endpoints
+- `/` - Root endpoint; returns current status
 
 ## Building and Running
-
-To build and run the application:
 
 ```bash
 bun install
 bun run src/index.ts
 ```
 
-Or build and run:
+Or compile and run:
 
 ```bash
 bun build src/index.ts --compile --outfile cnf-app
 ./cnf-app
 ```
 
-### Running in Container
-
-To containerize this application, create a Dockerfile.
+Configure the port and environment:
+```bash
+PORT=8080 ENVIRONMENT=production bun run src/index.ts
+```
 
 ## Purpose
 
-This simulator is designed to demonstrate how a Cloud-Native Network Function would behave in an O-Cloud environment, providing insights into:
+This simulator demonstrates CNF behavior in an O-Cloud environment, including:
 
+- Kubernetes probe compatibility (liveness/readiness)
+- Graceful shutdown handling
 - Application lifecycle management
-- Health monitoring
-- Configuration handling
-- Kubernetes integration
 - Environment awareness
+- Instance tracking
