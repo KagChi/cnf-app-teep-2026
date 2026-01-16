@@ -1,0 +1,21 @@
+{
+  "name": "cnf-app-teep-2026",
+  "version": "1.0.0",
+  "description": "This is a simple Bun TypeScript application that simulates a Cloud-Native Network Function (CNF) for the O-Cloud environment.",
+  "main": "dist",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "biome check src",
+    "lint:fix": "biome check --write src"
+  },
+  "type": "module",
+  "author": "KagChi",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
+    "@tsconfig/bun": "^1.0.10",
+    "@types/bun": "^1.3.6",
+    "biome": "^0.3.3",
+    "typescript": "^5.9.2"
+  }
+}
