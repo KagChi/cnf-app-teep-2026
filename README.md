@@ -29,9 +29,8 @@ bun run src/index.ts
 Or build and run:
 
 ```bash
-bun build src/index.ts --outfile cnf-app
+bun build src/index.ts --compile --outfile cnf-app
 ./cnf-app
-```
 ```
 
 ### Running in Container
