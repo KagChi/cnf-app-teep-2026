@@ -36,7 +36,7 @@ RUN ARCH=$(uname -m) && \
     --outfile dist/cnf-app \
     src/index.ts
 
-FROM docker.io/library/debian:13.2-slim AS prod
+FROM docker.io/library/debian:12-slim AS prod
 
 COPY --from=build /app/dist/cnf-app /usr/local/bin/cnf-app
 CMD ["cnf-app"]
