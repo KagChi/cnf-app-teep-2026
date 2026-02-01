@@ -11,8 +11,7 @@ RUN apt-get update \
         unzip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://bun.sh/install | bash \
-    && mv /root/.bun $BUN_INSTALL
+RUN curl -fsSL https://bun.sh/install | bash
 
 # Set working directory
 WORKDIR /app
