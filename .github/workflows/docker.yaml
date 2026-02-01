@@ -96,6 +96,7 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: 1
           ignore-unfixed: true
+          ignore-policy: .trivyignore
 
       - name: Build and push (multi-arch)
         if: ${{ github.event_name != 'pull_request' }}

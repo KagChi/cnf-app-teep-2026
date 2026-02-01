@@ -1,0 +1,7 @@
+# Inherited from oven/bun base image (Debian 13 OpenSSL packaging)
+# No OpenSSL CLI usage
+# No PKCS#12 processing
+# Waiting for upstream image rebuild
+
+CVE-2025-15467
+CVE-2025-69419

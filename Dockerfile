@@ -1,20 +1,21 @@
-FROM docker.io/oven/bun:1.3.7 AS build
+FROM debian:12-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV BUN_INSTALL=/usr/local/bun
+ENV PATH=$BUN_INSTALL/bin:$PATH
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://bun.sh/install | bash \
+    && mv /root/.bun $BUN_INSTALL
 
 # Set working directory
 WORKDIR /app
-
-# Install required packages for JS native dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    build-essential \
-    git \
-    ca-certificates \
-    python3 python-is-python3 \
-    tini \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && apt-get autoremove -y \
-    && apt-get autoclean -y \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy everything
 COPY . .
