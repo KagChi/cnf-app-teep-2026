@@ -1,4 +1,4 @@
-FROM debian:12-slim
+FROM debian:12-slim AS build
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV BUN_INSTALL=/usr/local/bun
