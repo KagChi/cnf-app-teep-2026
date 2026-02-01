@@ -19,6 +19,8 @@ RUN apt-get update \
 # Copy everything
 COPY . .
     
+RUN bun install
+
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "x86_64" ]; then \
     TARGET="bun-linux-x64-modern"; \
