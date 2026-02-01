@@ -1,4 +1,4 @@
-FROM docker.io/oven/bun:1.3.5 AS build
+FROM docker.io/oven/bun:1.3.7 AS build
 
 # Set working directory
 WORKDIR /app
@@ -6,12 +6,14 @@ WORKDIR /app
 # Install required packages for JS native dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        openssl \
-        libssl3t64 \
-    && apt-get purge -y openssl-provider-legacy \
-    && apt-get upgrade -y \
+    build-essential \
+    git \
+    ca-certificates \
+    python3 python-is-python3 \
+    tini \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get autoremove -y \
-    && apt-get clean \
+    && apt-get autoclean -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy everything
