@@ -6,14 +6,12 @@ WORKDIR /app
 # Install required packages for JS native dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    build-essential \
-    git \
-    ca-certificates \
-    python3 python-is-python3 \
-    tini \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+        openssl \
+        libssl3t64 \
+    && apt-get purge -y openssl-provider-legacy \
+    && apt-get upgrade -y \
     && apt-get autoremove -y \
-    && apt-get autoclean -y \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy everything
