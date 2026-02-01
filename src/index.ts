@@ -1,10 +1,42 @@
 import { serve } from "bun";
+import client from "prom-client";
 
 declare global {
 	var isShuttingDown: boolean;
 }
 
 globalThis.isShuttingDown = false;
+
+client.collectDefaultMetrics({ prefix: "cnf_" });
+
+const httpRequestsTotal = new client.Counter({
+	name: "cnf_http_requests_total",
+	help: "Total number of HTTP requests",
+	labelNames: ["method", "path", "status"]
+});
+
+const httpRequestDuration = new client.Histogram({
+	name: "cnf_http_request_duration_seconds",
+	help: "HTTP request latency",
+	labelNames: ["method", "path", "status"],
+	buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5]
+});
+
+const shuttingDownGauge = new client.Gauge({
+	name: "cnf_shutting_down",
+	help: "CNF shutting down state (1 = shutting down)"
+});
+
+const startTime = Date.now();
+const uptimeGauge = new client.Gauge({
+	name: "cnf_uptime_seconds",
+	help: "CNF uptime in seconds"
+});
+
+setInterval(() => {
+	uptimeGauge.set((Date.now() - startTime) / 1000);
+	shuttingDownGauge.set(globalThis.isShuttingDown ? 1 : 0);
+}, 5000);
 
 type CNFResponse = {
 	id: string;
@@ -43,38 +75,66 @@ console.log(`Environment: ${cnfResponse.environment}`);
 
 serve({
 	port,
-	fetch(req) {
+	async fetch(req) {
+		const start = process.hrtime.bigint();
 		const { pathname } = new URL(req.url);
+		let status = 200;
 
-		switch (pathname) {
-			case "/health/live":
-				if (globalThis.isShuttingDown) {
-					return json({ status: "shutting_down" }, 503);
-				}
+		try {
+			switch (pathname) {
+				case "/metrics":
+					return new Response(await client.register.metrics(), {
+						headers: { "Content-Type": client.register.contentType }
+					});
 
-				return json({
-					status: "healthy",
-					service: "cnf-simulator",
-					timestamp: now()
-				});
+				case "/health/live":
+					if (globalThis.isShuttingDown) {
+						status = 503;
+						return json({ status: "shutting_down" }, status);
+					}
 
-			case "/health/ready":
-			case "/":
-				return json({
-					...cnfResponse,
-					current_time: now()
-				});
+					return json({
+						status: "healthy",
+						service: "cnf-simulator",
+						timestamp: now()
+					});
 
-			case "/info":
-				return json({
-					service: "Cloud-Native Network Function",
-					description: "A simple Bun application simulating a CNF for an O-Cloud environment",
-					version: cnfResponse.version,
-					endpoints: ["/", "/health/live", "/health/ready", "/info"]
-				});
+				case "/health/ready":
+				case "/":
+					return json({
+						...cnfResponse,
+						current_time: now()
+					});
 
-			default:
-				return json({ error: "Not Found" }, 404);
+				case "/info":
+					return json({
+						service: "Cloud-Native Network Function",
+						description: "A simple Bun application simulating a CNF for an O-Cloud environment",
+						version: cnfResponse.version,
+						endpoints: ["/", "/health/live", "/health/ready", "/info", "/metrics"]
+					});
+
+				default:
+					status = 404;
+					return json({ error: "Not Found" }, status);
+			}
+		} finally {
+			const duration = Number(process.hrtime.bigint() - start) / 1_000_000_000;
+
+			httpRequestsTotal.inc({
+				method: req.method,
+				path: pathname,
+				status
+			});
+
+			httpRequestDuration.observe(
+				{
+					method: req.method,
+					path: pathname,
+					status
+				},
+				duration
+			);
 		}
 	}
 });
